@@ -59,4 +59,35 @@ export class UsersService {
 
     return { data: token };
   }
+
+  static async getCurrent(token: string) {
+    // 1. Find session by token
+    const [session] = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.token, token))
+      .limit(1);
+
+    if (!session) {
+      return { error: 'Unauthorized' };
+    }
+
+    // 2. Find user by userId from session
+    const [user] = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        createdAt: users.createdAt,
+      })
+      .from(users)
+      .where(eq(users.id, session.userId))
+      .limit(1);
+
+    if (!user) {
+      return { error: 'Unauthorized' };
+    }
+
+    return { data: user };
+  }
 }
