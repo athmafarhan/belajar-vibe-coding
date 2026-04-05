@@ -18,4 +18,20 @@ export const usersRoute = new Elysia({ prefix: '/api/users' })
       email: t.String(),
       password: t.String()
     })
+  })
+  .post('/login', async ({ body, set }) => {
+    const result = await UsersService.login(body);
+
+    if (result.error) {
+      set.status = 401;
+      return result;
+    }
+
+    set.status = 200;
+    return result;
+  }, {
+    body: t.Object({
+      email: t.String(),
+      password: t.String()
+    })
   });
