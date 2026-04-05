@@ -90,4 +90,22 @@ export class UsersService {
 
     return { data: user };
   }
+
+  static async logout(token: string) {
+    // 1. Check if session exists
+    const [session] = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.token, token))
+      .limit(1);
+
+    if (!session) {
+      return { error: 'Unauthorized' };
+    }
+
+    // 2. Delete session
+    await db.delete(sessions).where(eq(sessions.token, token));
+
+    return { data: 'OK' };
+  }
 }
