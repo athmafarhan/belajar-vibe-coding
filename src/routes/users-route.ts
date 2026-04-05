@@ -17,7 +17,15 @@ export const usersRoute = new Elysia({ prefix: '/api/users' })
       name: t.String({ maxLength: 255 }),
       email: t.String({ maxLength: 255 }),
       password: t.String({ maxLength: 255 })
-    })
+    }),
+    detail: {
+      tags: ['Auth'],
+      summary: 'Register a new user account'
+    },
+    response: {
+      201: t.Object({ data: t.String() }),
+      400: t.Object({ error: t.String() })
+    }
   })
   .post('/login', async ({ body, set }) => {
     const result = await UsersService.login(body);
@@ -33,7 +41,15 @@ export const usersRoute = new Elysia({ prefix: '/api/users' })
     body: t.Object({
       email: t.String(),
       password: t.String()
-    })
+    }),
+    detail: {
+      tags: ['Auth'],
+      summary: 'Login to existing user account'
+    },
+    response: {
+      200: t.Object({ data: t.String() }),
+      401: t.Object({ error: t.String() })
+    }
   })
   .get('/current', async ({ headers, set }) => {
     const auth = headers['authorization'];
@@ -52,6 +68,22 @@ export const usersRoute = new Elysia({ prefix: '/api/users' })
 
     set.status = 200;
     return result;
+  }, {
+    detail: {
+      tags: ['Auth'],
+      summary: 'Get current authorized user profil'
+    },
+    response: {
+      200: t.Object({
+        data: t.Object({
+          id: t.Number(),
+          name: t.String(),
+          email: t.String(),
+          createdAt: t.Date()
+        })
+      }),
+      401: t.Object({ error: t.String() })
+    }
   })
   .delete('/logout', async ({ headers, set }) => {
     const auth = headers['authorization'];
@@ -70,4 +102,13 @@ export const usersRoute = new Elysia({ prefix: '/api/users' })
 
     set.status = 200;
     return result;
+  }, {
+    detail: {
+      tags: ['Auth'],
+      summary: 'Logout current user session'
+    },
+    response: {
+      200: t.Object({ data: t.String() }),
+      401: t.Object({ error: t.String() })
+    }
   });
